@@ -18,15 +18,16 @@
  * It's a central place to find everything related to drivers in this project.
  */
 
-#define PKT_BUF_SIZE 12U // THIS BUFFER SIZE SHOULD BE VARIABLE BASED ON THE CMD 50
+#define PKT_BUF_SIZE \
+  12U  // THIS BUFFER SIZE SHOULD BE VARIABLE BASED ON THE CMD 50
 #define RX_QUEUE_SIZE 2U
 #define CMD_SIZE 1U
 
 // commands
-#define TURB 0x00U
-#define PH 0x01U
-#define TEMP 0x02U
-#define ALL 0x03U
+#define TURB 0x80U
+#define PH 0x90U
+#define TEMP 0xa0U
+#define ALL 0xb0U
 
 #define TURBIDITY_POS_INT 0U
 #define TURBIDITY_POS_DEC 2U
@@ -59,55 +60,51 @@
 #endif
 
 /** @brief water_sensor custom channels. */
-enum water_channel
-{
-	/** water channel verification. */
-	WATER_CHAN_PH = SENSOR_CHAN_PRIV_START,
-	WATER_CHAN_TURB,
-	WATER_CHAN_TEMP,
-	WATER_CHAN_ALL
+enum water_channel {
+  /** water channel verification. */
+  WATER_CHAN_PH = SENSOR_CHAN_PRIV_START,
+  WATER_CHAN_TURB,
+  WATER_CHAN_TEMP,
+  WATER_CHAN_ALL
 
 };
 /*
  * sensor data structure
  */
-typedef struct
-{
-	/** Integer part of the value. */
-	int16_t val1;
-	/** Fractional part of the value (in one-millionth parts). */
-	int16_t val2;
+typedef struct {
+  /** Integer part of the value. */
+  int16_t val1;
+  /** Fractional part of the value (in one-millionth parts). */
+  int16_t val2;
 } sensor_value_t;
 
 /*
  * water data structure
  */
-struct water_data
-{
-	/** RX queue buffer. */
-	uint8_t rx_queue_buf[PKT_BUF_SIZE * RX_QUEUE_SIZE];
-	/** RX/TX buffer. */
-	uint8_t buf[PKT_BUF_SIZE];
-	/** RX/TX buffer pointer. */
-	uint8_t *buf_ptr;
-	/** RX/TX buffer counter. */
-	uint8_t buf_ctr;
-	/** Expected reception data length. */
-	uint8_t rx_data_len;
-	/** Sensor value buffer. */
-	sensor_value_t pH;
-	sensor_value_t turb;
-	sensor_value_t temp;
-	/** RX queue. */
-	struct k_msgq rx_queue;
+struct water_data {
+  /** RX queue buffer. */
+  uint8_t rx_queue_buf[PKT_BUF_SIZE * RX_QUEUE_SIZE];
+  /** RX/TX buffer. */
+  uint8_t buf[PKT_BUF_SIZE];
+  /** RX/TX buffer pointer. */
+  uint8_t *buf_ptr;
+  /** RX/TX buffer counter. */
+  uint8_t buf_ctr;
+  /** Expected reception data length. */
+  uint8_t rx_data_len;
+  /** Sensor value buffer. */
+  sensor_value_t pH;
+  sensor_value_t turb;
+  sensor_value_t temp;
+  /** RX queue. */
+  struct k_msgq rx_queue;
 };
 /*
  * water config structure
  */
-struct water_config
-{
-	uint32_t addr;
-	const struct device *uart;
+struct water_config {
+  uint32_t addr;
+  const struct device *uart;
 };
 
 typedef struct water_data water_data_t;
@@ -127,11 +124,11 @@ typedef struct water_config water_config_t;
  * \endcode
  */
 static const struct uart_config uart_config = {
-	115200U,
-	UART_CFG_DATA_BITS_8,
-	UART_CFG_FLOW_CTRL_NONE,
-	UART_CFG_PARITY_NONE,
-	UART_CFG_STOP_BITS_2,
+    115200U,
+    UART_CFG_DATA_BITS_8,
+    UART_CFG_FLOW_CTRL_NONE,
+    UART_CFG_PARITY_NONE,
+    UART_CFG_STOP_BITS_2,
 };
 /** @} */
 #endif /* ZEPHYR_INCLUDE */
