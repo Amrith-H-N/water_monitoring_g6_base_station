@@ -23,8 +23,6 @@
 #include <zephyr/drivers/uart.h>
 #include <zephyr/sys/ring_buffer.h>
 #include "app/drivers/sensor/water.h"
-#include <stdio.h>
-#include <stdlib.h>
 
 /**
  * @defgroup drivers Drivers
@@ -183,6 +181,7 @@ static int water_recv(const struct device *dev, uint8_t rx_data_len)
 
 	return 0;
 }
+//--------------------------------------------------------------------
 
 /**
  * @defgroup drivers_water Water drivers
@@ -196,80 +195,43 @@ static int water_recv(const struct device *dev, uint8_t rx_data_len)
  */
 
 /**
- * @brief helper function to update values in the struct
+ * @brief helper funtion to update values in the struct
  *
- * format: [ (length) 8bit | (sensor cmd) 8bit | 8bit 8bit 8bit 8bit 8bit 8bit ]
+ *  format : [ (length) 8bit | (sensor cmd) 8bit | 8bit 8bit 8bit 8bit 8bit 8bit ]
  *
- * @param dev device struct
- * @param chan channel to update
- * @return int 0 if success
+ *  @param dev device struct
+ *  @param chan channel to update
+ *  @return int 0 if success
  */
-int update_value(const struct device *dev, enum water_channel chan)
+int update_value(const struct device *dev,
+				 enum water_channel chan)
 {
-    water_data_t *data = dev->data;
-    uint8_t rx_data_len;
-    char temp_buf[16]; // Temporary buffer to store the received value as a string
-    int integral_val, fractional_val;
-
-    switch (chan)
-    {
-    case WATER_CHAN_PH:
-        rx_data_len = 32;
-        water_send(dev, PH, rx_data_len);
-        water_recv(dev, rx_data_len);
-
-        memcpy(temp_buf, &data->rx_queue_buf[PH_POS_INT], PH_VALUE_LEN); //copy PH_VALUE_LEN bytes (the length of the integer part) from the position PH_POS_INT in data->rx_queue_buf into the temporary buffer temp_buf
-        temp_buf[PH_VALUE_LEN] = '\0'; // Null-terminate the string
-        data->pH.val1 = atoi(temp_buf); // Convert string to integer
-
-        memcpy(temp_buf, &data->rx_queue_buf[PH_POS_DEC], PH_DEC_LEN); //copy PH_DEC_LEN bytes (the length of the fractional part) from the position PH_POS_DEC in data->rx_queue_buf into the temporary buffer temp_buf
-        temp_buf[PH_DEC_LEN] = '\0'; // Null-terminate the string
-        data->pH.val2 = atoi(temp_buf); // Convert string to integer
-        break;
-
-    case WATER_CHAN_TEMP:
-        rx_data_len = 32;
-        water_send(dev, TEMP, rx_data_len);
-        water_recv(dev, rx_data_len);
-
-        memcpy(temp_buf, &data->rx_queue_buf[TEMP_POS_INT], TEMP_VALUE_LEN);
-        temp_buf[TEMP_VALUE_LEN] = '\0'; // Null-terminate the string
-        data->temp.val1 = atoi(temp_buf); // Convert string to integer
-
-        memcpy(temp_buf, &data->rx_queue_buf[TEMP_POS_DEC], TEMP_DEC_LEN);
-        temp_buf[TEMP_DEC_LEN] = '\0'; // Null-terminate the string
-        data->temp.val2 = atoi(temp_buf); // Convert string to integer
-        break;
-
-    case WATER_CHAN_TURB:
-        rx_data_len = 32;
-        water_send(dev, TURB, rx_data_len);
-        water_recv(dev, rx_data_len);
-
-        memcpy(temp_buf, &data->rx_queue_buf[TURB_POS_INT], TURB_VALUE_LEN);
-        temp_buf[TURB_VALUE_LEN] = '\0'; // Null-terminate the string
-        data->turb.val1 = atoi(temp_buf); // Convert string to integer
-
-        memcpy(temp_buf, &data->rx_queue_buf[TURB_POS_DEC], TURB_DEC_LEN);
-        temp_buf[TURB_DEC_LEN] = '\0'; // Null-terminate the string
-        data->turb.val2 = atoi(temp_buf); // Convert string to integer
-        break;
-
-    case WATER_CHAN_ALL:
-        rx_data_len = 96;
-        water_send(dev, ALL, rx_data_len);
-        water_recv(dev, rx_data_len);
-
-        // Handle the case where all sensor values are received together
-        // You'll need to extract the individual values from the received buffer
-        // and convert them to integers using a similar approach as above
-        break;
-
-    default:
-        return -ENOTSUP;
-    }
-
-    return 0;
+	water_config_t *config = dev->config;
+	water_data_t *data = dev->data;
+	uint8_t rx_data_len;
+	switch (chan)
+	{
+	case WATER_CHAN_PH:
+		rx_data_len = 32;
+		water_send(dev, PH, rx_data_len);
+		water_recv(dev, rx_data_len);
+		break;
+	case WATER_CHAN_TEMP:
+		rx_data_len = 32;
+		water_send(dev, TEMP, rx_data_len);
+		water_recv(dev, rx_data_len);
+	case WATER_CHAN_TURB:
+		rx_data_len = 32;
+		water_send(dev, TURB, rx_data_len);
+		water_recv(dev, rx_data_len);
+	case WATER_CHAN_ALL:
+		rx_data_len = 96;
+		water_send(dev, ALL, rx_data_len);
+		water_recv(dev, rx_data_len);
+	default:
+		return -ENOTSUP;
+	}
+	return 0;
 }
 
 /** @brief water_sample fetch function to update the values from sensor to struct
@@ -389,4 +351,3 @@ static int water_init(const struct device *dev)
 						  CONFIG_SENSOR_INIT_PRIORITY, &water_api);
 
 DT_INST_FOREACH_STATUS_OKAY(WATER_INIT)
-

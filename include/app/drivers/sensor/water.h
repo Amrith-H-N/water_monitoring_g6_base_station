@@ -127,11 +127,11 @@ typedef struct water_config water_config_t;
  * \endcode
  */
 static const struct uart_config uart_config = {
-	.baudrate = 115200U,
-	.data_bits = UART_CFG_DATA_BITS_8,
-	.flow_ctrl = UART_CFG_FLOW_CTRL_NONE,
-	.parity = UART_CFG_PARITY_NONE,
-	.stop_bits = UART_CFG_STOP_BITS_2,
+	115200U,
+	UART_CFG_DATA_BITS_8,
+	UART_CFG_FLOW_CTRL_NONE,
+	UART_CFG_PARITY_NONE,
+	UART_CFG_STOP_BITS_2,
 };
 /** @} */
 #endif /* ZEPHYR_INCLUDE */
