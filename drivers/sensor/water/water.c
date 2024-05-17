@@ -183,7 +183,6 @@ static int water_recv(const struct device *dev, uint8_t rx_data_len)
 
 	return 0;
 }
-//--------------------------------------------------------------------
 
 /**
  * @defgroup drivers_water Water drivers
@@ -196,15 +195,6 @@ static int water_recv(const struct device *dev, uint8_t rx_data_len)
  *
  */
 
-/**
- * @brief helper funtion to update values in the struct
- *
- *  format : [ (length) 8bit | (sensor cmd) 8bit | 8bit 8bit 8bit 8bit 8bit 8bit ]
- *
- *  @param dev device struct
- *  @param chan channel to update
- *  @return int 0 if success
- */
 /**
  * @brief helper function to update values in the struct
  *
