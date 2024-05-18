@@ -12,6 +12,7 @@
  */
 
 #define DT_DRV_COMPAT zephyr_water
+#define WATER_INIT_PRIORITY 41
 
 #include "app/drivers/sensor/water.h"
 
@@ -107,7 +108,7 @@ static void uart_cb_handler(const struct device *dev, void *user_data) {
  *
  * @param dev Sensor instance.
  * @param cmd Command to send.
- * @param rx_data_len Expected data reception length.
+ * @param rx_data_len Expected data reception length in bytes
  *
  * @retval 0 Success , -EMSGSIZE If TX/RX data length is too large.
  *
@@ -189,26 +190,26 @@ static int water_recv(const struct device *dev, uint8_t rx_data_len) {
  *  @param chan channel to update
  *  @return int 0 if success
  */
-int update_value(const struct device *dev, enum water_channel chan) {
-  water_config_t *config = dev->config;
-  water_data_t *data = dev->data;
+int update_value(const struct device *dev, enum sensor_channel chan) {
+  // water_config_t *config = dev->config;
+  // water_data_t *data = dev->data;
   uint8_t rx_data_len;
   switch (chan) {
     case WATER_CHAN_PH:
-      rx_data_len = 32;
+      rx_data_len = 4;
       water_send(dev, PH, rx_data_len);
       water_recv(dev, rx_data_len);
       break;
     case WATER_CHAN_TEMP:
-      rx_data_len = 32;
+      rx_data_len = 4;
       water_send(dev, TEMP, rx_data_len);
       water_recv(dev, rx_data_len);
     case WATER_CHAN_TURB:
-      rx_data_len = 32;
+      rx_data_len = 4;
       water_send(dev, TURB, rx_data_len);
       water_recv(dev, rx_data_len);
     case WATER_CHAN_ALL:
-      rx_data_len = 96;
+      rx_data_len = 12;
       water_send(dev, ALL, rx_data_len);
       water_recv(dev, rx_data_len);
     default:
@@ -227,7 +228,7 @@ int update_value(const struct device *dev, enum water_channel chan) {
  *  @return int returns 0 if succeeful otherwise Error code
  */
 static int water_sample_fetch(const struct device *dev,
-                              enum water_channel chan) {
+                              enum sensor_channel chan) {
   if (chan > WATER_CHAN_ALL || chan < WATER_CHAN_PH) {
     return -ENOTSUP;
   }
@@ -246,10 +247,11 @@ static int water_sample_fetch(const struct device *dev,
  *  @param val struct sensor_value type struct to retrieve sensor value
  *  @return int returns 0 if succeeful otherwise Error code
  */
-static int water_channel_get(const struct device *dev, enum water_channel chan,
+static int water_channel_get(const struct device *dev, enum sensor_channel chan,
                              struct sensor_value *val) {
   water_data_t *data = dev->data;
-  switch (chan) {
+  enum water_channel my_chan = (enum water_channel)chan;
+  switch (my_chan) {
     case WATER_CHAN_PH:
       data->pH.val1 =
           data->rx_queue_buf[SINGLE_POS_INT];  // write code to get data from
@@ -281,8 +283,10 @@ static int water_channel_get(const struct device *dev, enum water_channel chan,
   return 0;
 }
 
-static const struct sensor_driver_api water_api = {&water_sample_fetch,
-                                                   &water_channel_get};
+static const struct sensor_driver_api water_api = {
+    .sample_fetch = water_sample_fetch,
+    .channel_get = water_channel_get,
+};
 
 /** @brief water_init function checks for uart device and copies all
  * configuration
@@ -296,13 +300,28 @@ static const struct sensor_driver_api water_api = {&water_sample_fetch,
 static int water_init(const struct device *dev) {
   const struct water_config *config = dev->config;
   water_data_t *data = dev->data;
-  int ret;
-
-  if (!device_is_ready(config->uart)) {
+  volatile int ret;
+  printk("water_init started");
+  const struct device *water_dev = DEVICE_DT_GET(DT_NODELABEL(uart1));
+  if (!device_is_ready(water_dev)) {
     LOG_ERR("UART device not ready\n");
+    printk("water_init failed");
     return ENXIO;
   }
-  ret = uart_configure(config->uart, &uart_config);
+  // ret = uart_configure(config->uart->config, &uart_config);
+  volatile struct uart_config cfg;
+
+  ret = uart_config_get(water_dev, &cfg);
+  cfg.baudrate = myuart_config.baudrate;
+  cfg.data_bits = myuart_config.data_bits;
+  cfg.flow_ctrl = myuart_config.flow_ctrl;
+  cfg.parity = myuart_config.parity;
+  cfg.stop_bits = myuart_config.stop_bits;
+
+  // // ret = uart_config_data_bits(config->uart, cfg.data_bits);
+  ret = uart_configure(water_dev, &cfg);
+  ret = uart_config_get(water_dev, &cfg);
+
   if (ret < 0) {
     return ret;
   }
@@ -310,9 +329,14 @@ static int water_init(const struct device *dev) {
   uart_irq_callback_user_data_set(config->uart, uart_cb_handler, (void *)dev);
 
   k_msgq_init(&data->rx_queue, data->rx_queue_buf, PKT_BUF_SIZE, RX_QUEUE_SIZE);
-  water_send(dev, RESOLUTION, 0);
-  water_send(dev, SAMPLINT_TIME, 0);
 
+  unsigned char ch[128] = "hello world";
+
+  uart_poll_out(water_dev, ch);
+
+  // water_send(dev, RESOLUTION, 0);
+  // water_send(dev, SAMPLINT_TIME, 0);
+  printk("water_init ok");
   return 0;
 }
 /** @} */
@@ -323,7 +347,7 @@ static int water_init(const struct device *dev) {
   static const struct water_config water_config_##i = {       \
       /*.input = GPIO_DT_SPEC_INST_GET(i, input_gpios), */    \
       .uart = DEVICE_DT_GET(DT_NODELABEL(uart1)),             \
-      .addr = DT_INST_REG_ADDR(i),                            \
+                                                              \
   };                                                          \
                                                               \
   DEVICE_DT_INST_DEFINE(i, water_init, NULL, &water_data_##i, \

@@ -7,7 +7,7 @@
 #define ZEPHYR_INCLUDE_ZEPHYR_DRIVERS_SENSOR_H_
 
 #include <zephyr/drivers/sensor.h>
-
+#include <zephyr/drivers/uart.h>
 /**
  * @defgroup drivers Drivers
  * @{
@@ -103,7 +103,6 @@ struct water_data {
  * water config structure
  */
 struct water_config {
-  uint32_t addr;
   const struct device *uart;
 };
 
@@ -123,12 +122,12 @@ typedef struct water_config water_config_t;
  * };
  * \endcode
  */
-static const struct uart_config uart_config = {
-    115200U,
+static const struct uart_config myuart_config = {
+    115200,
     UART_CFG_DATA_BITS_8,
     UART_CFG_FLOW_CTRL_NONE,
     UART_CFG_PARITY_NONE,
-    UART_CFG_STOP_BITS_2,
+    UART_CFG_STOP_BITS_1,
 };
 /** @} */
 #endif /* ZEPHYR_INCLUDE */

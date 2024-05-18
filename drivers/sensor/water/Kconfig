@@ -1,13 +1,16 @@
 menuconfig WATER
     bool "Water Sensor Node"
+    select SERIAL
+	select UART_INTERRUPT_DRIVEN
     help
         Enable the Water Sensor Node.
 
 if WATER
 
+
 config WATER_UART_DEV_NAME
     string "UART device name"
-    default "UART_0"
+    default "UART_1"
     help
         Specify the UART device name on the main system to be used for
         communication with the Water Sensor Node.
@@ -51,3 +54,4 @@ config WATER_RES_1X
 config WATER_RES_2X
 	bool "x2"
 endchoice
+
