@@ -5,9 +5,10 @@ status = "okay";
 pinctrl-0 = <&uart1_default>;
 pinctrl-names = "default";
 		
-	mywater: water10 {
+	water: water {
 		compatible = "zephyr,water";
-		status = "okay";
+		status = "disabled";
+		zephyr,deferred-init;
 		
 };
 };

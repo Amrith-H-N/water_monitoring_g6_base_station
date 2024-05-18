@@ -302,8 +302,8 @@ static int water_init(const struct device *dev) {
   water_data_t *data = dev->data;
   volatile int ret;
   printk("water_init started");
-  const struct device *water_dev = DEVICE_DT_GET(DT_NODELABEL(uart1));
-  if (!device_is_ready(water_dev)) {
+  // const struct device *water_dev = DEVICE_DT_GET(DT_NODELABEL(uart1));
+  if (!device_is_ready(config->uart)) {
     LOG_ERR("UART device not ready\n");
     printk("water_init failed");
     return ENXIO;
@@ -311,29 +311,31 @@ static int water_init(const struct device *dev) {
   // ret = uart_configure(config->uart->config, &uart_config);
   volatile struct uart_config cfg;
 
-  ret = uart_config_get(water_dev, &cfg);
+  ret = uart_config_get(config->uart, &cfg);
   cfg.baudrate = myuart_config.baudrate;
-  cfg.data_bits = myuart_config.data_bits;
-  cfg.flow_ctrl = myuart_config.flow_ctrl;
-  cfg.parity = myuart_config.parity;
-  cfg.stop_bits = myuart_config.stop_bits;
+  // cfg.data_bits = myuart_config.data_bits;
+  //  cfg.flow_ctrl = myuart_config.flow_ctrl;
+  // cfg.parity = myuart_config.parity;
+  // cfg.stop_bits = myuart_config.stop_bits;
 
   // // ret = uart_config_data_bits(config->uart, cfg.data_bits);
-  ret = uart_configure(water_dev, &cfg);
-  ret = uart_config_get(water_dev, &cfg);
+  ret = uart_configure(config->uart, &cfg);
+  // ret = uart_config_get(config->uart, &cfg);
 
   if (ret < 0) {
     return ret;
   }
 
-  uart_irq_callback_user_data_set(config->uart, uart_cb_handler, (void *)dev);
+  // uart_irq_callback_user_data_set(config->uart, uart_cb_handler, (void
+  // *)dev);
 
-  k_msgq_init(&data->rx_queue, data->rx_queue_buf, PKT_BUF_SIZE, RX_QUEUE_SIZE);
-
-  unsigned char ch[128] = "hello world";
-
-  uart_poll_out(water_dev, ch);
-
+  // k_msgq_init(&data->rx_queue, data->rx_queue_buf, PKT_BUF_SIZE,
+  // RX_QUEUE_SIZE);
+  unsigned char ch = 'a';
+  while (1) {
+    uart_poll_out(config->uart, ch);
+    k_msleep(1000);
+  }
   // water_send(dev, RESOLUTION, 0);
   // water_send(dev, SAMPLINT_TIME, 0);
   printk("water_init ok");
@@ -341,17 +343,34 @@ static int water_init(const struct device *dev) {
 }
 /** @} */
 /** @} */
-#define WATER_INIT(i)                                         \
-  static struct water_data water_data_##i;                    \
-                                                              \
-  static const struct water_config water_config_##i = {       \
-      /*.input = GPIO_DT_SPEC_INST_GET(i, input_gpios), */    \
-      .uart = DEVICE_DT_GET(DT_NODELABEL(uart1)),             \
-                                                              \
-  };                                                          \
-                                                              \
-  DEVICE_DT_INST_DEFINE(i, water_init, NULL, &water_data_##i, \
-                        &water_config_##i, POST_KERNEL,       \
-                        CONFIG_SENSOR_INIT_PRIORITY, &water_api);
+// #define WATER_INIT(i)                                         \
+//   static struct water_data water_data_##i;                    \
+//                                                               \
+//   static const struct water_config water_config_##i = {       \
+//       /*.input = GPIO_DT_SPEC_INST_GET(i, input_gpios), */    \
+//       .uart = DEVICE_DT_GET(DT_NODELABEL(uart1)),             \
+//                                                               \
+//   };                                                          \
+//                                                               \
+//   DEVICE_DT_INST_DEFINE(i, water_init, NULL, &water_data_##i, \
+//                         &water_config_##i, POST_KERNEL,       \
+//                         CONFIG_SENSOR_INIT_PRIORITY, &water_api);
 
-DT_INST_FOREACH_STATUS_OKAY(WATER_INIT)
+// DT_INST_FOREACH_STATUS_OKAY(WATER_INIT)
+
+#ifdef CONFIG_WATER
+
+/* Move the DEVICE_DECLARE macro invocation here */
+DEVICE_DECLARE(water);
+
+static const struct water_config water_config = {
+    .uart = DEVICE_DT_GET(DT_NODELABEL(uart1)),
+};
+
+static struct water_data water_data;
+
+DEVICE_DEFINE(CONFIG_WATER, "water", water_init, NULL, &water_data,
+              &water_config, POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE,
+              &water_api);
+
+#endif /* CONFIG_WATER */

@@ -20,7 +20,9 @@ LOG_MODULE_REGISTER(app, LOG_LEVEL_INF);
 
 int main(void) {
   printk("Zephyr Example Application %s\n", APP_VERSION_STRING);
-  const struct device *water_dev = DEVICE_DT_GET(DT_NODELABEL(mywater));
+  const struct device *water_dev =
+      device_get_binding(DT_NODE_FULL_NAME(DT_NODELABEL(water)));
+  // device_init(water_dev);
 
   struct sensor_value ph, temp, turb;
   int ret;
@@ -31,11 +33,11 @@ int main(void) {
     return -1;
   }
 
-  LOG_INF("Water sensor application started");
+  // LOG_INF("Water sensor application started");
 
-  ret = sensor_sample_fetch_chan(water_dev, WATER_CHAN_PH);
+  // ret = sensor_sample_fetch_chan(water_dev, WATER_CHAN_PH);
 
-  ret = sensor_channel_get(water_dev, WATER_CHAN_PH, &ph);
+  // ret = sensor_channel_get(water_dev, WATER_CHAN_PH, &ph);
 
   // while (1) {
   //   /* Get pH value */
