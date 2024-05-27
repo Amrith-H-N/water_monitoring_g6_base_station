@@ -20,27 +20,27 @@
 
 #define PKT_BUF_SIZE \
   12U  // THIS BUFFER SIZE SHOULD BE VARIABLE BASED ON THE CMD 50
-#define RX_QUEUE_SIZE 2U
-#define CMD_SIZE 1U
+#define RX_QUEUE_SIZE 2
+#define CMD_SIZE 1
 
 // commands
-#define TURB 0x80U
-#define PH 0x90U
-#define TEMP 0xa0U
-#define ALL 0xb0U
+#define TURB 0x80
+#define PH 0x90
+#define TEMP 0xa0
+#define ALL 0xb0
 
-#define TURBIDITY_POS_INT 0U
-#define TURBIDITY_POS_DEC 2U
-#define PH_POS_INT 4U
-#define PH_POS_DEC 6U
-#define TEMP_POS_INT 8U
-#define TEMP_POS_DEC 10U
-#define SINGLE_POS_INT 0U
-#define SINGLE_POS_DEC 2U
+#define TURBIDITY_POS_INT 0
+#define TURBIDITY_POS_DEC 2
+#define PH_POS_INT 4
+#define PH_POS_DEC 6
+#define TEMP_POS_INT 8
+#define TEMP_POS_DEC 10
+#define SINGLE_POS_INT 0
+#define SINGLE_POS_DEC 2
 // #define PKT_HEADER_POS    0U
 
-#define PKT_CMD_POS 0U
-#define PKT_SAM_TIME_POS 8U
+#define PKT_CMD_POS 0
+#define PKT_SAM_TIME_POS 8
 //------------
 #if defined CONFIG_WATER_OVER_1X
 #define SAMPLINT_TIME 1U

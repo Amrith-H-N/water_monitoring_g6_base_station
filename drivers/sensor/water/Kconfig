@@ -1,30 +1,13 @@
-menuconfig WATER
-    bool "Water Sensor Node"
-    select SERIAL
+config WATER
+	bool "water sensor"
+	default y
+	depends on DT_HAS_ZEPHYR_WATER_ENABLED
+	select GPIO
+	select SERIAL
 	select UART_INTERRUPT_DRIVEN
-    help
-        Enable the Water Sensor Node.
+	help
+		"need water help!"
 
-if WATER
-
-
-config WATER_UART_DEV_NAME
-    string "UART device name"
-    default "UART_1"
-    help
-        Specify the UART device name on the main system to be used for
-        communication with the Water Sensor Node.
-
-config WATER_UART_BAUD_RATE
-    int "UART baud rate"
-    default 115200
-    help
-        Set the baud rate for UART communication with the Water Sensor Node.
-        This baud rate must match the configuration on the sensor node side
-        for proper communication.
-
-
-endif # WATER
 choice
 	prompt "WATER oversampling"
 	default WATER_OVER_2X

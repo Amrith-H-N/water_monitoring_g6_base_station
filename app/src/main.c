@@ -22,7 +22,6 @@ int main(void) {
   printk("Zephyr Example Application %s\n", APP_VERSION_STRING);
   const struct device *water_dev =
       device_get_binding(DT_NODE_FULL_NAME(DT_NODELABEL(water)));
-  // device_init(water_dev);
 
   struct sensor_value ph, temp, turb;
   int ret;
@@ -33,11 +32,32 @@ int main(void) {
     return -1;
   }
 
-  // LOG_INF("Water sensor application started");
+  LOG_INF("Water sensor application started");
 
-  // ret = sensor_sample_fetch_chan(water_dev, WATER_CHAN_PH);
-
-  // ret = sensor_channel_get(water_dev, WATER_CHAN_PH, &ph);
+  /* Get PH value */
+  ret = sensor_sample_fetch_chan(water_dev, WATER_CHAN_PH);
+  if (ret) {
+    LOG_ERR("Failed to fetch temperature value (err %d)", ret);
+  } else {
+    ret = sensor_channel_get(water_dev, WATER_CHAN_PH, &ph);
+    if (ret) {
+      LOG_ERR("Failed to get temperature value (err %d)", ret);
+    } else {
+      LOG_INF("Temperature: %d.%06d", ph.val1, ph.val2);
+    }
+  }
+  /* Get temperature value */
+  ret = sensor_sample_fetch_chan(water_dev, WATER_CHAN_TEMP);
+  if (ret) {
+    LOG_ERR("Failed to fetch temperature value (err %d)", ret);
+  } else {
+    ret = sensor_channel_get(water_dev, WATER_CHAN_TEMP, &temp);
+    if (ret) {
+      LOG_ERR("Failed to get temperature value (err %d)", ret);
+    } else {
+      LOG_INF("Temperature: %d.%06d", temp.val1, temp.val2);
+    }
+  }
 
   // while (1) {
   //   /* Get pH value */

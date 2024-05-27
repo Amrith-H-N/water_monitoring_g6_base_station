@@ -1,4 +1,16 @@
 
+&pinctrl {
+	uart1_default: uart1_default {
+		group1 {
+			pinmux = <UART1_TX_P4>;
+		};
+		group2 {
+			pinmux = <UART1_RX_P5>;
+			input-enable;
+		};
+};
+};
+
 &uart1 {
 current-speed = <115200>;
 status = "okay";
@@ -7,9 +19,7 @@ pinctrl-names = "default";
 		
 	water: water {
 		compatible = "zephyr,water";
-		status = "disabled";
-		zephyr,deferred-init;
-		
+		status = "okay";
 };
 };
 
