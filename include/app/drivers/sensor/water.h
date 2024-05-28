@@ -19,15 +19,15 @@
  */
 
 #define PKT_BUF_SIZE \
-  12U  // THIS BUFFER SIZE SHOULD BE VARIABLE BASED ON THE CMD 50
+  50  // THIS BUFFER SIZE SHOULD BE VARIABLE BASED ON THE CMD 50
 #define RX_QUEUE_SIZE 2
 #define CMD_SIZE 1
 
 // commands
-#define TURB 0x80
-#define PH 0x90
-#define TEMP 0xa0
-#define ALL 0xb0
+#define TURB 0x85
+#define PH 0x92
+#define TEMP 0xA5
+#define ALL 0xB4
 
 #define TURBIDITY_POS_INT 0
 #define TURBIDITY_POS_DEC 2
@@ -43,20 +43,20 @@
 #define PKT_SAM_TIME_POS 8
 //------------
 #if defined CONFIG_WATER_OVER_1X
-#define SAMPLINT_TIME 1U
+#define SAMPLINT_TIME 11U
 #elif defined CONFIG_WATER_OVER_2X
-#define SAMPLINT_TIME 2U
+#define SAMPLINT_TIME 12U
 #elif defined CONFIG_WATER_OVER_4X
-#define SAMPLINT_TIME 3U
+#define SAMPLINT_TIME 13U
 #elif defined CONFIG_WATER_OVER_8X
-#define SAMPLINT_TIME 4U
+#define SAMPLINT_TIME 14U
 #elif defined CONFIG_WATER_OVER_16X
-#define SAMPLINT_TIME 5U
+#define SAMPLINT_TIME 15U
 #endif
 #if defined CONFIG_WATER_RES_1X
-#define RESOLUTION 10U
+#define RESOLUTION 0x0aU
 #elif defined CONFIG_WATER_RES_2X
-#define RESOLUTION 12U
+#define RESOLUTION 0x0cU
 #endif
 
 /** @brief water_sensor custom channels. */
