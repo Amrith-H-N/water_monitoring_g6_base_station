@@ -43,20 +43,20 @@
 #define PKT_SAM_TIME_POS 8
 //------------
 #if defined CONFIG_WATER_OVER_1X
-#define SAMPLINT_TIME 11U
+#define SAMPLINT_TIME 03U
 #elif defined CONFIG_WATER_OVER_2X
-#define SAMPLINT_TIME 12U
+#define SAMPLINT_TIME 04U
 #elif defined CONFIG_WATER_OVER_4X
-#define SAMPLINT_TIME 13U
+#define SAMPLINT_TIME 05U
 #elif defined CONFIG_WATER_OVER_8X
-#define SAMPLINT_TIME 14U
+#define SAMPLINT_TIME 06U
 #elif defined CONFIG_WATER_OVER_16X
-#define SAMPLINT_TIME 15U
+#define SAMPLINT_TIME 07U
 #endif
 #if defined CONFIG_WATER_RES_1X
-#define RESOLUTION 0x0aU
+#define RESOLUTION 0x01U
 #elif defined CONFIG_WATER_RES_2X
-#define RESOLUTION 0x0cU
+#define RESOLUTION 0x02U
 #endif
 
 /** @brief water_sensor custom channels. */

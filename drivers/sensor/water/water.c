@@ -293,8 +293,10 @@ static const struct sensor_driver_api water_api = {
 };
 
 void initialize(const struct device *dev) {
-  // water_send(dev, RESOLUTION, 0);
-  // water_send(dev, SAMPLINT_TIME, 0);
+  water_send(dev, RESOLUTION, 0);
+   k_msleep(1000);
+
+  water_send(dev, SAMPLINT_TIME, 0);
 
   // int rx_data_len = 4;
   // water_send(dev, (uint8_t)TURB, rx_data_len);
@@ -334,7 +336,7 @@ static int water_init(const struct device *dev) {
   uart_irq_rx_enable(config->uart);
 
   k_msleep(1000);
-  // initialize(dev);
+  initialize(dev);
   LOG_INF("Water_init done");
   LOG_INF("starting commuication...");
 
