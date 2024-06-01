@@ -40,7 +40,8 @@ LOG_MODULE_REGISTER(water_driver, LOG_LEVEL_DBG);
 /**
  * @brief UART RX handler.
  *
- * @param dev Sensor instance.
+ * @param dev uart device
+ * @param user_data sensor instance
  */
 static void uart_cb_rx_handler(const struct device *dev, void *user_data) {
   int n = 0;
