@@ -281,6 +281,16 @@ static int water_channel_get(const struct device *dev, enum sensor_channel chan,
   return 0;
 }
 
+/**
+ * @brief sensor sensor_driver_api configuration.
+ *
+ * \code{.cpp}
+ * static const struct sensor_driver_api water_api = {
+ *   .sample_fetch = water_sample_fetch,
+ *   .channel_get = water_channel_get,
+};
+ * \endcode
+ */
 static const struct sensor_driver_api water_api = {
     .sample_fetch = water_sample_fetch,
     .channel_get = water_channel_get,
