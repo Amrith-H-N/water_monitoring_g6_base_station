@@ -59,9 +59,6 @@ static void uart_cb_rx_handler(const struct device *dev, void *user_data) {
         mbuffer[n++] = c;
       }
 
-      // printf("irq rx: ");
-      // for (int i = 0; i < n; i++) printf("%x ", (uint8_t)mbuffer[i]);
-
       if (n >= data->rx_data_len) {
         LOG_HEXDUMP_DBG(data->buf, data->buf_ctr, "RX");
         if (k_msgq_put(&data->rx_queue, mbuffer, K_NO_WAIT) < 0) {
@@ -71,6 +68,7 @@ static void uart_cb_rx_handler(const struct device *dev, void *user_data) {
     }
   }
 }
+
 /**
  * @brief Send a command to the sensor.
  *
@@ -93,8 +91,6 @@ static int water_send(const struct device *dev, uint8_t cmd,
 
   data->buf[PKT_CMD_POS] = cmd;
 
-  // data->buf[PKT_SAM_TIME_POS] = sam_time;
-
   /* store expected reception data length */
   data->rx_data_len = rx_data_len;
 
@@ -106,7 +102,6 @@ static int water_send(const struct device *dev, uint8_t cmd,
   // send data uart polling
   uart_poll_out(config->uart, (uint8_t)cmd);
   k_msleep(500);
-  // LOG_HEXDUMP_DBG(data->buf, data->buf_ctr, "TX");
 
   return 0;
 }
@@ -143,7 +138,6 @@ static int water_recv(const struct device *dev, uint8_t rx_data_len) {
 
   return 0;
 }
-//--------------------------------------------------------------------
 
 /**
  * @defgroup drivers_water Water drivers
@@ -168,7 +162,6 @@ static int water_recv(const struct device *dev, uint8_t rx_data_len) {
  *  @return int 0 if success
  */
 int update_value(const struct device *dev, enum sensor_channel chan) {
-  // water_config_t *config = dev->config;
   water_data_t *data = dev->data;
   uint8_t rx_data_len;
   int ret;
@@ -294,12 +287,9 @@ static const struct sensor_driver_api water_api = {
 
 void initialize(const struct device *dev) {
   water_send(dev, RESOLUTION, 0);
-   k_msleep(1000);
+  k_msleep(1000);
 
   water_send(dev, SAMPLINT_TIME, 0);
-
-  // int rx_data_len = 4;
-  // water_send(dev, (uint8_t)TURB, rx_data_len);
 }
 
 /** @brief water_init function checks for uart device and copies all
@@ -348,7 +338,7 @@ static int water_init(const struct device *dev) {
   static struct water_data water_data_##i;                    \
                                                               \
   static const struct water_config water_config_##i = {       \
-      /*.input = GPIO_DT_SPEC_INST_GET(i, input_gpios), */    \
+                                                              \
       .uart = DEVICE_DT_GET(DT_INST_BUS(i)),                  \
                                                               \
   };                                                          \
@@ -358,20 +348,3 @@ static int water_init(const struct device *dev) {
                         CONFIG_SENSOR_INIT_PRIORITY, &water_api);
 
 DT_INST_FOREACH_STATUS_OKAY(WATER_INIT)
-
-// #ifdef CONFIG_WATER
-
-// /* Move the DEVICE_DECLARE macro invocation here */
-// DEVICE_DECLARE(water);
-
-// static const struct water_config water_config = {
-//     .uart = DEVICE_DT_GET(DT_INST_BUS(uart1)),
-// };
-
-// static struct water_data water_data;
-
-// DEVICE_DEFINE(CONFIG_WATER, "water", water_init, NULL, &water_data,
-//               &water_config, POST_KERNEL,
-//               CONFIG_KERNEL_INIT_PRIORITY_DEVICE, &water_api);
-
-// #endif /* CONFIG_WATER */
