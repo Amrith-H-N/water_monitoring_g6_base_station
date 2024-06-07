@@ -154,9 +154,8 @@ static int water_recv(const struct device *dev, uint8_t rx_data_len) {
 /**
  * @brief helper funtion to update values in the struct
  *
- *  format : [ (length) 8bit | (sensor cmd) 8bit | 8bit 8bit 8bit 8bit 8bit
- * 8bit
- * ]
+ *  format CMD 8 bit : [ byte1 ]
+ *  format data 32bits: [ msb(integer) lsb(integer) msb(decimal) lsb(decimal) ]
  *
  *  @param dev device struct
  *  @param chan channel to update
